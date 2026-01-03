@@ -9,6 +9,7 @@ obj/
 *.user
 *.suo
 *.sln.docstates
+.env*
 
 # ==========================================
 # 2. Angular (front_mojo)
