@@ -22,7 +22,7 @@ namespace api_mojo.controllers
             return Ok(acc);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetAccessoireById(int id)
         {
             var acc = await db.Accessoires.SingleOrDefaultAsync(a => a.Id == id);
@@ -33,7 +33,7 @@ namespace api_mojo.controllers
             return Ok(new { Accessoire = acc });
         }
 
-        [HttpGet("name")]
+        [HttpGet("name/{name}")]
         public async Task<IActionResult> GetAccessoireByName(string name)
         {
             var acc = await db.Accessoires.SingleOrDefaultAsync(a => a.Name == name);
@@ -67,7 +67,7 @@ namespace api_mojo.controllers
             return Ok(new { Message = "Accesoire Modifié", Accessoire = fdb });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAccessoire(int id)
         {
             var acc = await db.Accessoires.SingleOrDefaultAsync(a => a.Id == id);

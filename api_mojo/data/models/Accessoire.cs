@@ -16,5 +16,8 @@ namespace api_mojo.data.models
         [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
         public int Stock { get; set; }
+
+        // Remplace public List<Contrat> Contrats = []; par :
+        public virtual List<Contrat> Contrats { get; set; } = new();
     }
 }

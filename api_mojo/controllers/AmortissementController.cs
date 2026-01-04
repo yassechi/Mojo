@@ -23,7 +23,7 @@ namespace api_mojo.controllers
             return Ok(amortissement);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetAmortissementById(int id)
         {
             var amortissement = await db.Amortissements.SingleOrDefaultAsync(a => a.Id == id);
@@ -58,7 +58,7 @@ namespace api_mojo.controllers
             return Ok(new { msg = "Amortissement Modifié", obj = fdb });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAmortissement(int id)
         {
             var amortissement = await db.Amortissements.SingleOrDefaultAsync(a => a.Id == id);

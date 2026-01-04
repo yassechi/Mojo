@@ -22,7 +22,7 @@ namespace api_mojo.controllers
             return Ok(msg);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetMsgById(int id)
         {
             var msg = await db.Messages.SingleOrDefaultAsync(a => a.Id == id);
@@ -55,7 +55,7 @@ namespace api_mojo.controllers
             return Ok(new { msg = "Message Modifié", obj = fdb });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMessage(int id)
         {
             var msg = await db.Messages.SingleOrDefaultAsync(a => a.Id == id);

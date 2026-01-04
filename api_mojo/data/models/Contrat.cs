@@ -17,5 +17,20 @@ namespace api_mojo.data.models
         public DateOnly DateFin { get; set; }
         public decimal LoyerMensuelHT { get; set; }
         public bool StatutContrat { get; set; }
+
+        [ForeignKey(nameof(Velo))]
+        public int VeloId { get; set; }
+        public Velo? Velo { get; set; }
+        
+        // Remplace public List<Accessoire> Accessoires = []; par :
+        public virtual List<Accessoire> Accessoires { get; set; } = new();
+
+        // LIEN 1 : L'utilisateur standard (Bénéficiaire - le "0")
+        public int BeneficiaireId { get; set; }
+        public virtual User Beneficiaire { get; set; } = null!;
+
+        // LIEN 2 : Le Chef (User RH - le "1")
+        public int UserRhId { get; set; }
+        public virtual User UserRH { get; set; } = null!;
     }
 }

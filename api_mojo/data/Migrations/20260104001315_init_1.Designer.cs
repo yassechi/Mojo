@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api_mojo.data;
 
@@ -11,9 +12,11 @@ using api_mojo.data;
 namespace api_mojo.data.migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104001315_init_1")]
+    partial class init_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,7 +117,7 @@ namespace api_mojo.data.migrations
                     b.Property<bool>("StatutContrat")
                         .HasColumnType("bit");
 
-                    b.Property<int>("UserRhId")
+                    b.Property<int>("UserIdRH")
                         .HasColumnType("int");
 
                     b.Property<int>("VeloId")
@@ -124,7 +127,7 @@ namespace api_mojo.data.migrations
 
                     b.HasIndex("BeneficiaireId");
 
-                    b.HasIndex("UserRhId");
+                    b.HasIndex("UserIdRH");
 
                     b.HasIndex("VeloId");
 
@@ -363,7 +366,7 @@ namespace api_mojo.data.migrations
 
                     b.HasOne("api_mojo.data.models.User", "UserRH")
                         .WithMany("ContratsGeres")
-                        .HasForeignKey("UserRhId")
+                        .HasForeignKey("UserIdRH")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -22,7 +22,7 @@ namespace api_mojo.controllers
             return Ok(contrat);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetContratById(int id)
         {
             var contrat = await db.Contrats.SingleOrDefaultAsync(a => a.Id == id);
@@ -57,7 +57,7 @@ namespace api_mojo.controllers
             return Ok(new { msg = "Contrat Modifié", obj = fdb });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContrat(int id)
         {
             var contrat = await db.Contrats.SingleOrDefaultAsync(a => a.Id == id);

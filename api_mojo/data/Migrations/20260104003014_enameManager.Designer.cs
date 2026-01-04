@@ -9,11 +9,11 @@ using api_mojo.data;
 
 #nullable disable
 
-namespace api_mojo.data.Migrations
+namespace api_mojo.data.migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260103180637_init_1")]
-    partial class init_1
+    [Migration("20260104003014_enameManager")]
+    partial class enameManager
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace api_mojo.data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AccessoireContrat", b =>
+                {
+                    b.Property<int>("AccessoiresId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContratsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AccessoiresId", "ContratsId");
+
+                    b.HasIndex("ContratsId");
+
+                    b.ToTable("AccessoireContrat");
+                });
 
             modelBuilder.Entity("api_mojo.data.models.Accessoire", b =>
                 {
@@ -69,7 +84,12 @@ namespace api_mojo.data.Migrations
                     b.Property<decimal>("ValeurResiduelleFinale")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<int>("VeloId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("VeloId");
 
                     b.ToTable("Amortissements");
                 });
@@ -81,6 +101,9 @@ namespace api_mojo.data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BeneficiaireId")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly>("DateDebut")
                         .HasColumnType("date");
@@ -94,25 +117,21 @@ namespace api_mojo.data.Migrations
                     b.Property<bool>("StatutContrat")
                         .HasColumnType("bit");
 
+                    b.Property<int>("UserRhId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VeloId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("BeneficiaireId");
+
+                    b.HasIndex("UserRhId");
+
+                    b.HasIndex("VeloId");
 
                     b.ToTable("Contrats");
-                });
-
-            modelBuilder.Entity("api_mojo.data.models.Contrat_Accessoire", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Quanity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Contrat_Accessoires");
                 });
 
             modelBuilder.Entity("api_mojo.data.models.Discussion", b =>
@@ -133,7 +152,12 @@ namespace api_mojo.data.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Discussions");
                 });
@@ -160,7 +184,12 @@ namespace api_mojo.data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("VeloId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("VeloId");
 
                     b.ToTable("Interventions");
                 });
@@ -180,7 +209,17 @@ namespace api_mojo.data.Migrations
                     b.Property<DateTime>("DateEnvoi")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DiscussionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DiscussionId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Messages");
                 });
@@ -244,6 +283,9 @@ namespace api_mojo.data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
@@ -251,6 +293,8 @@ namespace api_mojo.data.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
 
                     b.ToTable("Users");
                 });
@@ -284,6 +328,129 @@ namespace api_mojo.data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Velos");
+                });
+
+            modelBuilder.Entity("AccessoireContrat", b =>
+                {
+                    b.HasOne("api_mojo.data.models.Accessoire", null)
+                        .WithMany()
+                        .HasForeignKey("AccessoiresId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_mojo.data.models.Contrat", null)
+                        .WithMany()
+                        .HasForeignKey("ContratsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.Amortissement", b =>
+                {
+                    b.HasOne("api_mojo.data.models.Velo", "Velo")
+                        .WithMany("Amortissements")
+                        .HasForeignKey("VeloId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Velo");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.Contrat", b =>
+                {
+                    b.HasOne("api_mojo.data.models.User", "Beneficiaire")
+                        .WithMany("ContratsRecus")
+                        .HasForeignKey("BeneficiaireId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("api_mojo.data.models.User", "UserRH")
+                        .WithMany("ContratsGeres")
+                        .HasForeignKey("UserRhId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("api_mojo.data.models.Velo", "Velo")
+                        .WithMany("Contrats")
+                        .HasForeignKey("VeloId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Beneficiaire");
+
+                    b.Navigation("UserRH");
+
+                    b.Navigation("Velo");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.Discussion", b =>
+                {
+                    b.HasOne("api_mojo.data.models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.Intervention", b =>
+                {
+                    b.HasOne("api_mojo.data.models.Velo", "Velo")
+                        .WithMany("Interventions")
+                        .HasForeignKey("VeloId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Velo");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.Message", b =>
+                {
+                    b.HasOne("api_mojo.data.models.Discussion", "Discussion")
+                        .WithMany()
+                        .HasForeignKey("DiscussionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_mojo.data.models.User", "User")
+                        .WithMany("Messages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Discussion");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.User", b =>
+                {
+                    b.HasOne("api_mojo.data.models.Organisation", "Organisation")
+                        .WithMany()
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organisation");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.User", b =>
+                {
+                    b.Navigation("ContratsGeres");
+
+                    b.Navigation("ContratsRecus");
+
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("api_mojo.data.models.Velo", b =>
+                {
+                    b.Navigation("Amortissements");
+
+                    b.Navigation("Contrats");
+
+                    b.Navigation("Interventions");
                 });
 #pragma warning restore 612, 618
         }

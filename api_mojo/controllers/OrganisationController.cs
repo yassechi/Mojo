@@ -22,7 +22,7 @@ namespace api_mojo.controllers
             return Ok(organisation);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetOrganisationById(int id)
         {
             var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Id == id);
@@ -33,7 +33,7 @@ namespace api_mojo.controllers
             return Ok(new { obj = organisation });
         }
 
-        [HttpGet("name")]
+        [HttpGet("name/{name}")]
         public async Task<IActionResult> GetOrganisationByName(string name)
         {
             var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Name == name);
@@ -69,7 +69,7 @@ namespace api_mojo.controllers
             return Ok(new { msg = "Organisation Modifié", obj = organisation });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganisation(int id)
         {
             var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Id == id);

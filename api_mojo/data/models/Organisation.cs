@@ -15,5 +15,7 @@ namespace api_mojo.data.models
         public string Address { get; set; } = null!;
         public string ContactEmail { get; set; } = null!;
         public bool IsActif { get; set; }
+
+        List<User> Users { get; set; } = [];
     }
 }

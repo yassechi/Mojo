@@ -18,11 +18,11 @@ namespace api_mojo.controllers
         [HttpGet]
         public async Task<ActionResult> GetAllUsers()
         {
-            var user = await db.Accessoires.ToListAsync();
+            var user = await db.Users.ToListAsync();
             return Ok(user);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await db.Users.SingleOrDefaultAsync(a => a.Id == id);
@@ -32,8 +32,8 @@ namespace api_mojo.controllers
             }
             return Ok(new { obj = user });
         }
-
-        [HttpGet("name")]
+        
+        [HttpGet("name/{name}")]
         public async Task<IActionResult> GetUserByName(string name)
         {
             var user = await db.Users.SingleOrDefaultAsync(a => a.LasttName == name);
@@ -71,7 +71,7 @@ namespace api_mojo.controllers
             return Ok(new { msg = "User Modifié", obj = fdb });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await db.Users.SingleOrDefaultAsync(a => a.Id == id);

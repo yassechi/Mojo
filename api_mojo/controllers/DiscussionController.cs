@@ -21,8 +21,7 @@ namespace api_mojo.controllers
             var discussion = await db.Discussions.ToListAsync();
             return Ok(discussion);
         }
-
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetdiscussionById(int id)
         {
             var discussion = await db.Discussions.SingleOrDefaultAsync(a => a.Id == id);
@@ -56,7 +55,7 @@ namespace api_mojo.controllers
             return Ok(new { msg = "Discussion Modifié", obj = fdb });
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDiscussion(int id)
         {
             var discussion = await db.Discussions.SingleOrDefaultAsync(a => a.Id == id);
