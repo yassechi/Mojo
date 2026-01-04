@@ -16,7 +16,8 @@ namespace data_mojo.repositories
 
         public async Task<List<Contrat>> GetAll()
         {
-            return await db.Contrats.ToListAsync();
+            // return await db.Contrats.ToListAsync();
+            return await db.Contrats.Include(c => c.Velo).ToListAsync();
         }
 
         public async Task<Contrat?> GetById(int id)
@@ -26,8 +27,6 @@ namespace data_mojo.repositories
 
         public async Task<Contrat?> GetByName(string name)
         {
-            // Note: Si le contrat n'a pas de propriété 'Name', 
-            // vous pouvez adapter cette recherche (ex: par numéro de contrat)
             throw new NotImplementedException("La recherche par nom n'est pas définie pour les contrats.");
         }
 

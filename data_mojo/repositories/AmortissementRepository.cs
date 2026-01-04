@@ -69,6 +69,5 @@ namespace data_mojo.repositories
             db.SaveChanges();
             return true;
         }
-
     }
 }
