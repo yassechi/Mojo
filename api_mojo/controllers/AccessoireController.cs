@@ -1,5 +1,6 @@
 using api_mojo.data;
 using api_mojo.data.models;
+using api_mojo.dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,26 +46,33 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAccesoire(Accessoire acc)
+        public async Task<IActionResult> AddAccesoire(AccessoireAddDto accessoireAddDto)
         {
-            await db.Accessoires.AddAsync(acc);
+            Accessoire accessoire = new()
+            {
+                Name = accessoireAddDto.Name,
+                Price = accessoireAddDto.Price,
+                Stock = accessoireAddDto.Stock
+            };
+
+            await db.Accessoires.AddAsync(accessoire);
             db.SaveChanges();
-            return Ok(new { message = "Accesoire Ajouté !", accessoire = acc });
+            return Ok(new { message = "Accesoire Ajouté !", accessoire = accessoireAddDto });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteAccessoire(Accessoire acc)
+        public async Task<IActionResult> UpadteAccessoire(AccessoireUpdateDto accessoireUpdateDto)
         {
-            var fdb = await db.Accessoires.SingleOrDefaultAsync(a => a.Id == acc.Id);
-            if (fdb is null)
+            var accessoire = await db.Accessoires.SingleOrDefaultAsync(a => a.Id == accessoireUpdateDto.Id);
+            if (accessoire is null)
             {
-                return NotFound($"Cet accessoire \"{acc.Name}\" n'existe pas !");
+                return NotFound($"Cet accessoire \"{accessoireUpdateDto.Name}\" n'existe pas !");
             }
-            fdb.Name = acc.Name;
-            fdb.Price = acc.Price;
-            fdb.Stock = acc.Stock;
+            accessoire.Name = accessoireUpdateDto.Name;
+            accessoire.Price = accessoireUpdateDto.Price;
+            accessoire.Stock = accessoireUpdateDto.Stock;
             db.SaveChanges();
-            return Ok(new { Message = "Accesoire Modifié", Accessoire = fdb });
+            return Ok(new { Message = "Accesoire Modifié", Accessoire = accessoire });
         }
 
         [HttpDelete("{id}")]

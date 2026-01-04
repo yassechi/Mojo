@@ -2,6 +2,7 @@ using api_mojo.data;
 using api_mojo.data.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api_mojo.dtos;
 
 namespace api_mojo.controllers
 {
@@ -34,28 +35,36 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddVelo(Velo velo)
+        public async Task<IActionResult> AddVelo(VeloAddDto veloAddDto)
         {
+            Velo velo = new()
+            {
+                NumeroSerie = veloAddDto.NumeroSerie,
+                Marque = veloAddDto.Marque,
+                Modele = veloAddDto.Modele,
+                PrixAchat = veloAddDto.PrixAchat,
+                Status = veloAddDto.Status
+            };
             await db.Velos.AddAsync(velo);
             db.SaveChanges();
             return Ok(new { msg = "Velo Ajouté !", obj = velo });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteVelo(Velo velo)
+        public async Task<IActionResult> UpadteVelo(VeloUpdateDto veloUpdateDto)
         {
-            var fdb = await db.Velos.SingleOrDefaultAsync(a => a.Id == velo.Id);
-            if (fdb is null)
+            var velo = await db.Velos.SingleOrDefaultAsync(a => a.Id == veloUpdateDto.Id);
+            if (velo is null)
             {
-                return NotFound($"Ce velo \"{velo.Id}\" n'existe pas !");
+                return NotFound($"Ce velo \"{veloUpdateDto.Id}\" n'existe pas !");
             }
-            fdb.NumeroSerie = velo.NumeroSerie;
-            fdb.Marque = velo.Marque;
-            fdb.Modele = velo.Modele;
-            fdb.PrixAchat = velo.PrixAchat;
-            fdb.Status = velo.Status;
+            velo.NumeroSerie = veloUpdateDto.NumeroSerie;
+            velo.Marque = veloUpdateDto.Marque;
+            velo.Modele = veloUpdateDto.Modele;
+            velo.PrixAchat = veloUpdateDto.PrixAchat;
+            velo.Status = veloUpdateDto.Status;
             db.SaveChanges();
-            return Ok(new { msg = "Velo Modifié", obj = fdb });
+            return Ok(new { msg = "Velo Modifié", obj = velo });
         }
 
         [HttpDelete("{id}")]

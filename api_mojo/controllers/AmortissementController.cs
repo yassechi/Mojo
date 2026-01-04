@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using api_mojo.data;
 using api_mojo.data.models;
 using Microsoft.EntityFrameworkCore;
+using api_mojo.dtos;
 
 
 namespace api_mojo.controllers
@@ -35,27 +36,35 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAmortissements(Amortissement amortissement)
+        public async Task<IActionResult> AddAmortissements(AmortissmentAddDto amortDto)
         {
+            Amortissement amortissement = new()
+            {
+                DateDebut = amortDto.DateDebut,
+                ValeurInit = amortDto.ValeurInit,
+                DureeMois = amortDto.DureeMois,
+                ValeurResiduelleFinale = amortDto.ValeurResiduelleFinale,
+                VeloId = amortDto.VeloId
+            };
             await db.Amortissements.AddAsync(amortissement);
             db.SaveChanges();
             return Ok(new { message = "Amortissement Ajouté !", obj = amortissement });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteAmortissement(Amortissement amortissement)
+        public async Task<IActionResult> UpadteAmortissement(AmortissmentUpdateDto amortissementDto)
         {
-            var fdb = await db.Amortissements.SingleOrDefaultAsync(a => a.Id == amortissement.Id);
-            if (fdb is null)
+            var amortissement = await db.Amortissements.SingleOrDefaultAsync(a => a.Id == amortissementDto.Id);
+            if (amortissement is null)
             {
-                return NotFound($"Cet amortissement \"{amortissement.Id}\" n'existe pas !");
+                return NotFound($"Cet amortissement \"{amortissementDto.Id}\" n'existe pas !");
             }
-            fdb.DateDebut = amortissement.DateDebut;
-            fdb.ValeurInit = amortissement.ValeurInit;
-            fdb.DureeMois = amortissement.DureeMois;
-            fdb.ValeurResiduelleFinale = amortissement.ValeurResiduelleFinale;
+            amortissement.DateDebut = amortissementDto.DateDebut;
+            amortissement.ValeurInit = amortissementDto.ValeurInit;
+            amortissement.DureeMois = amortissementDto.DureeMois;
+            amortissement.ValeurResiduelleFinale = amortissementDto.ValeurResiduelleFinale;
             db.SaveChanges();
-            return Ok(new { msg = "Amortissement Modifié", obj = fdb });
+            return Ok(new { msg = "Amortissement Modifié", obj = amortissement });
         }
 
         [HttpDelete("{id}")]

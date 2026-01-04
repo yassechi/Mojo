@@ -23,7 +23,7 @@ namespace api_mojo.data.models
         public Velo? Velo { get; set; }
         
         // Remplace public List<Accessoire> Accessoires = []; par :
-        public virtual List<Accessoire> Accessoires { get; set; } = new();
+        public virtual List<Accessoire> Accessoires { get; set; } = [];
 
         // LIEN 1 : L'utilisateur standard (Bénéficiaire - le "0")
         public int BeneficiaireId { get; set; }

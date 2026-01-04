@@ -2,6 +2,7 @@ using api_mojo.data;
 using api_mojo.data.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api_mojo.dtos;
 
 namespace api_mojo.controllers
 {
@@ -34,25 +35,32 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMsg(Message msg)
+        public async Task<IActionResult> AddMsg(MessageAddDto messageAddDto)
         {
-            await db.Messages.AddAsync(msg);
+            Message message = new()
+            {
+                Contenu = messageAddDto.Contenu,
+                DateEnvoi = messageAddDto.DateEnvoi,
+                UserId = messageAddDto.UserId,
+                DiscussionId = messageAddDto.DiscussionId
+            };
+            await db.Messages.AddAsync(message);
             db.SaveChanges();
-            return Ok(new { msg = "Message Ajouté !", obj = msg });
+            return Ok(new { msg = "Message Ajouté !", obj = message });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteMessage(Message msg)
+        public async Task<IActionResult> UpadteMessage(MessageUpdateDto messageUpdateDto)
         {
-            var fdb = await db.Messages.SingleOrDefaultAsync(a => a.Id == msg.Id);
-            if (fdb is null)
+            var message = await db.Messages.SingleOrDefaultAsync(a => a.Id == messageUpdateDto.Id);
+            if (message is null)
             {
-                return NotFound($"Ce User \"{msg.Id}\" n'existe pas !");
+                return NotFound($"Ce User \"{messageUpdateDto.Id}\" n'existe pas !");
             }
-            fdb.Contenu = msg.Contenu;
-            fdb.DateEnvoi = msg.DateEnvoi;
+            message.Contenu = messageUpdateDto.Contenu;
+            message.DateEnvoi = messageUpdateDto.DateEnvoi;
             db.SaveChanges();
-            return Ok(new { msg = "Message Modifié", obj = fdb });
+            return Ok(new { msg = "Message Modifié", obj = message });
         }
 
         [HttpDelete("{id}")]

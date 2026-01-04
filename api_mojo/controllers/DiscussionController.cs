@@ -2,6 +2,7 @@ using api_mojo.data;
 using api_mojo.data.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api_mojo.dtos;
 
 namespace api_mojo.controllers
 {
@@ -33,24 +34,31 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddDiscussion(Discussion discussion)
+        public async Task<IActionResult> AddDiscussion(DiscussionAddDto discussionAddDto)
         {
+            Discussion discussion = new()
+            {
+                Objet = discussionAddDto.Objet,
+                Status = discussionAddDto.Status,
+                DateCreation = discussionAddDto.DateCreation,
+                UserId = discussionAddDto.UserId
+            };
             await db.Discussions.AddAsync(discussion);
             db.SaveChanges();
             return Ok(new { msg = "Discussion Ajouté !", obj = discussion });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteDiscussion(Discussion discussion)
+        public async Task<IActionResult> UpadteDiscussion(DiscussionUpdateDto discussionUpdateDto)
         {
-            var fdb = await db.Discussions.SingleOrDefaultAsync(a => a.Id == discussion.Id);
+            var fdb = await db.Discussions.SingleOrDefaultAsync(a => a.Id == discussionUpdateDto.Id);
             if (fdb is null)
             {
-                return NotFound($"Ce User \"{discussion.Id}\" n'existe pas !");
+                return NotFound($"Ce User \"{discussionUpdateDto.Id}\" n'existe pas !");
             }
-            fdb.Objet = discussion.Objet;
-            fdb.Status = discussion.Status;
-            fdb.DateCreation = discussion.DateCreation;
+            fdb.Objet = discussionUpdateDto.Objet;
+            fdb.Status = discussionUpdateDto.Status;
+            fdb.DateCreation = discussionUpdateDto.DateCreation;
             db.SaveChanges();
             return Ok(new { msg = "Discussion Modifié", obj = fdb });
         }

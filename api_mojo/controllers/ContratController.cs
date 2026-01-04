@@ -2,6 +2,7 @@ using api_mojo.data;
 using api_mojo.data.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api_mojo.dtos;
 
 namespace api_mojo.controllers
 {
@@ -34,27 +35,37 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddContrat(Contrat contrat)
+        public async Task<IActionResult> AddContrat(ContratAddDto contratAddDto)
         {
+            Contrat contrat = new()
+            {
+                DateDebut = contratAddDto.DateDebut,
+                DateFin = contratAddDto.DateFin,
+                LoyerMensuelHT = contratAddDto.LoyerMensuelHT,
+                StatutContrat = contratAddDto.StatutContrat,
+                VeloId = contratAddDto.VeloId,
+                BeneficiaireId = contratAddDto.BeneficiaireId,
+                UserRhId = contratAddDto.UserRhId
+            };
             await db.Contrats.AddAsync(contrat);
             db.SaveChanges();
             return Ok(new { msg = "Contrat Ajouté !", obj = contrat });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteContrat(Contrat contrat)
+        public async Task<IActionResult> UpadteContrat(ContratUpdateDto contratUpdateDto)
         {
-            var fdb = await db.Contrats.SingleOrDefaultAsync(a => a.Id == contrat.Id);
-            if (fdb is null)
+            var contrat = await db.Contrats.SingleOrDefaultAsync(a => a.Id == contratUpdateDto.Id);
+            if (contrat is null)
             {
-                return NotFound($"Ce contrat \"{contrat.Id}\" n'existe pas !");
+                return NotFound($"Ce contrat \"{contratUpdateDto.Id}\" n'existe pas !");
             }
-            fdb.DateDebut = contrat.DateDebut;
-            fdb.DateFin = contrat.DateFin;
-            fdb.LoyerMensuelHT = contrat.LoyerMensuelHT;
-            fdb.StatutContrat = contrat.StatutContrat;
+            contrat.DateDebut = contratUpdateDto.DateDebut;
+            contrat.DateFin = contratUpdateDto.DateFin;
+            contrat.LoyerMensuelHT = contratUpdateDto.LoyerMensuelHT;
+            contrat.StatutContrat = contratUpdateDto.StatutContrat;
             db.SaveChanges();
-            return Ok(new { msg = "Contrat Modifié", obj = fdb });
+            return Ok(new { msg = "Contrat Modifié", obj = contrat });
         }
 
         [HttpDelete("{id}")]

@@ -2,6 +2,7 @@ using api_mojo.data;
 using api_mojo.data.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api_mojo.dtos;
 
 namespace api_mojo.controllers
 {
@@ -45,30 +46,41 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser(User user)
+        public async Task<IActionResult> AddUser(UserAddDto userAddDto)
         {
+            User user = new()
+            {
+                FirstName = userAddDto.FirstName,
+                LasttName = userAddDto.LasttName,
+                Email = userAddDto.Email,
+                Hpassword = userAddDto.Hpassword,
+                Role = userAddDto.Role,
+                TailleCm = userAddDto.TailleCm,
+                IsActif = userAddDto.IsActif,
+                OrganisationId = userAddDto.OrganisationId
+            };
             await db.Users.AddAsync(user);
             db.SaveChanges();
             return Ok(new { message = "User Ajouté !", obj = user });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteUser(User user)
+        public async Task<IActionResult> UpadteUser(UserUpdateDto userUpdateDto)
         {
-            var fdb = await db.Users.SingleOrDefaultAsync(a => a.Id == user.Id);
-            if (fdb is null)
+            var user = await db.Users.SingleOrDefaultAsync(a => a.Id == userUpdateDto.Id);
+            if (user is null)
             {
-                return NotFound($"Ce User \"{user.LasttName}\" n'existe pas !");
+                return NotFound($"Ce User \"{userUpdateDto.LasttName}\" n'existe pas !");
             }
-            fdb.FirstName = user.FirstName;
-            fdb.LasttName = user.LasttName;
-            fdb.Email = user.Email;
-            fdb.Hpassword = user.Hpassword;
-            fdb.Role = user.Role;
-            fdb.TailleCm = user.TailleCm;
-            fdb.IsActif = user.IsActif;
+            user.FirstName = userUpdateDto.FirstName;
+            user.LasttName = userUpdateDto.LasttName;
+            user.Email = userUpdateDto.Email;
+            user.Hpassword = userUpdateDto.Hpassword;
+            user.Role = userUpdateDto.Role;
+            user.TailleCm = userUpdateDto.TailleCm;
+            user.IsActif = userUpdateDto.IsActif;
             db.SaveChanges();
-            return Ok(new { msg = "User Modifié", obj = fdb });
+            return Ok(new { msg = "User Modifié", obj = user });
         }
 
         [HttpDelete("{id}")]
