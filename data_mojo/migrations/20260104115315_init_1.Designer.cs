@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using api_mojo.data;
+using data_mojo;
 
 #nullable disable
 
-namespace api_mojo.data.migrations
+namespace data_mojo.migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104115315_init_1")]
+    partial class init_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("AccessoireContrat");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Accessoire", b =>
+            modelBuilder.Entity("data_mojo.models.Accessoire", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +64,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Accessoires");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Amortissement", b =>
+            modelBuilder.Entity("data_mojo.models.Amortissement", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,7 +94,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Amortissements");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Contrat", b =>
+            modelBuilder.Entity("data_mojo.models.Contrat", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -131,7 +134,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Contrats");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Discussion", b =>
+            modelBuilder.Entity("data_mojo.models.Discussion", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +162,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Discussions");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Intervention", b =>
+            modelBuilder.Entity("data_mojo.models.Intervention", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -191,7 +194,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Interventions");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Message", b =>
+            modelBuilder.Entity("data_mojo.models.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -221,7 +224,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Organisation", b =>
+            modelBuilder.Entity("data_mojo.models.Organisation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -253,7 +256,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Organisations");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.User", b =>
+            modelBuilder.Entity("data_mojo.models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -296,7 +299,7 @@ namespace api_mojo.data.migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Velo", b =>
+            modelBuilder.Entity("data_mojo.models.Velo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -329,22 +332,22 @@ namespace api_mojo.data.migrations
 
             modelBuilder.Entity("AccessoireContrat", b =>
                 {
-                    b.HasOne("api_mojo.data.models.Accessoire", null)
+                    b.HasOne("data_mojo.models.Accessoire", null)
                         .WithMany()
                         .HasForeignKey("AccessoiresId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api_mojo.data.models.Contrat", null)
+                    b.HasOne("data_mojo.models.Contrat", null)
                         .WithMany()
                         .HasForeignKey("ContratsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Amortissement", b =>
+            modelBuilder.Entity("data_mojo.models.Amortissement", b =>
                 {
-                    b.HasOne("api_mojo.data.models.Velo", "Velo")
+                    b.HasOne("data_mojo.models.Velo", "Velo")
                         .WithMany("Amortissements")
                         .HasForeignKey("VeloId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -353,21 +356,21 @@ namespace api_mojo.data.migrations
                     b.Navigation("Velo");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Contrat", b =>
+            modelBuilder.Entity("data_mojo.models.Contrat", b =>
                 {
-                    b.HasOne("api_mojo.data.models.User", "Beneficiaire")
+                    b.HasOne("data_mojo.models.User", "Beneficiaire")
                         .WithMany("ContratsRecus")
                         .HasForeignKey("BeneficiaireId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("api_mojo.data.models.User", "UserRH")
+                    b.HasOne("data_mojo.models.User", "UserRH")
                         .WithMany("ContratsGeres")
                         .HasForeignKey("UserRhId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("api_mojo.data.models.Velo", "Velo")
+                    b.HasOne("data_mojo.models.Velo", "Velo")
                         .WithMany("Contrats")
                         .HasForeignKey("VeloId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -380,9 +383,9 @@ namespace api_mojo.data.migrations
                     b.Navigation("Velo");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Discussion", b =>
+            modelBuilder.Entity("data_mojo.models.Discussion", b =>
                 {
-                    b.HasOne("api_mojo.data.models.User", "User")
+                    b.HasOne("data_mojo.models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -391,9 +394,9 @@ namespace api_mojo.data.migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Intervention", b =>
+            modelBuilder.Entity("data_mojo.models.Intervention", b =>
                 {
-                    b.HasOne("api_mojo.data.models.Velo", "Velo")
+                    b.HasOne("data_mojo.models.Velo", "Velo")
                         .WithMany("Interventions")
                         .HasForeignKey("VeloId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -402,15 +405,15 @@ namespace api_mojo.data.migrations
                     b.Navigation("Velo");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Message", b =>
+            modelBuilder.Entity("data_mojo.models.Message", b =>
                 {
-                    b.HasOne("api_mojo.data.models.Discussion", "Discussion")
+                    b.HasOne("data_mojo.models.Discussion", "Discussion")
                         .WithMany()
                         .HasForeignKey("DiscussionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api_mojo.data.models.User", "User")
+                    b.HasOne("data_mojo.models.User", "User")
                         .WithMany("Messages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -421,9 +424,9 @@ namespace api_mojo.data.migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.User", b =>
+            modelBuilder.Entity("data_mojo.models.User", b =>
                 {
-                    b.HasOne("api_mojo.data.models.Organisation", "Organisation")
+                    b.HasOne("data_mojo.models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -432,7 +435,7 @@ namespace api_mojo.data.migrations
                     b.Navigation("Organisation");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.User", b =>
+            modelBuilder.Entity("data_mojo.models.User", b =>
                 {
                     b.Navigation("ContratsGeres");
 
@@ -441,7 +444,7 @@ namespace api_mojo.data.migrations
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("api_mojo.data.models.Velo", b =>
+            modelBuilder.Entity("data_mojo.models.Velo", b =>
                 {
                     b.Navigation("Amortissements");
 

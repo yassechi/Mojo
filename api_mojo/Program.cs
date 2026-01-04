@@ -1,4 +1,4 @@
-using api_mojo.data;
+using data_mojo;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

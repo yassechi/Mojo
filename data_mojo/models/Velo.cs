@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace api_mojo.data.models
+namespace data_mojo.models
 {
     public class Velo
     {

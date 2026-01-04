@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using api_mojo.data;
-using api_mojo.data.models;
+using data_mojo;
+using data_mojo.models;
 using Microsoft.EntityFrameworkCore;
 using api_mojo.dtos;
 

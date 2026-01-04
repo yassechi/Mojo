@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace api_mojo.data.migrations
+namespace data_mojo.migrations
 {
     /// <inheritdoc />
     public partial class init_1 : Migration
@@ -144,7 +144,7 @@ namespace api_mojo.data.migrations
                     StatutContrat = table.Column<bool>(type: "bit", nullable: false),
                     VeloId = table.Column<int>(type: "int", nullable: false),
                     BeneficiaireId = table.Column<int>(type: "int", nullable: false),
-                    UserIdRH = table.Column<int>(type: "int", nullable: false)
+                    UserRhId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -156,8 +156,8 @@ namespace api_mojo.data.migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Contrats_Users_UserIdRH",
-                        column: x => x.UserIdRH,
+                        name: "FK_Contrats_Users_UserRhId",
+                        column: x => x.UserRhId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -259,9 +259,9 @@ namespace api_mojo.data.migrations
                 column: "BeneficiaireId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Contrats_UserIdRH",
+                name: "IX_Contrats_UserRhId",
                 table: "Contrats",
-                column: "UserIdRH");
+                column: "UserRhId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Contrats_VeloId",
