@@ -1,8 +1,7 @@
-using data_mojo;
-using data_mojo.models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using api_mojo.dtos;
+using data_mojo.models;
+using data_mojo.dtos;
+using data_mojo.interfaces;
 
 namespace api_mojo.controllers
 {
@@ -10,23 +9,24 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class InterventionController : ControllerBase
     {
-        private readonly AppDbContext db;
-        public InterventionController(AppDbContext _db)
+        private readonly IRepository<Intervention, InterventionAddDto, InterventionUpdateDto> _rep;
+
+        public InterventionController(IRepository<Intervention, InterventionAddDto, InterventionUpdateDto> rep)
         {
-            db = _db;
+            _rep = rep;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAllInterventions()
         {
-            var intervention = await db.Interventions.ToListAsync();
-            return Ok(intervention);
+            var interventions = await _rep.GetAll();
+            return Ok(interventions);
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetInterventionById(int id)
         {
-            var intervention = await db.Interventions.SingleOrDefaultAsync(a => a.Id == id);
+            var intervention = await _rep.GetById(id);
             if (intervention is null)
             {
                 return NotFound($"L'intervention avec l'Id:{id} n'existe pas !");
@@ -35,49 +35,31 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddInterventions(InterventionAddDto interventionAddDto)
+        public async Task<IActionResult> AddIntervention(InterventionAddDto dto)
         {
-            Intervention intervention = new()
-            {
-                DateIntervention = interventionAddDto.DateIntervention,
-                TypeIntervention = interventionAddDto.TypeIntervention,
-                Description = interventionAddDto.Description,
-                Cout = interventionAddDto.Cout,
-                VeloId = interventionAddDto.VeloId
-            };
-            await db.Interventions.AddAsync(intervention);
-            db.SaveChanges();
-            return Ok(new { message = "Accesoire Ajouté !", obj = intervention });
+            var intervention = await _rep.Add(dto);
+            return Ok(new { message = "Intervention Ajoutée !", obj = intervention });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteIntervention(InterventionUpdateDto interventionUpdateDto)
+        public async Task<IActionResult> UpadteIntervention(InterventionUpdateDto dto)
         {
-            var fdb = await db.Interventions.SingleOrDefaultAsync(a => a.Id == interventionUpdateDto.Id);
-            if (fdb is null)
+            var intervention = await _rep.Upadte(dto);
+            if (intervention is null)
             {
-                return NotFound($"Cet Intervention \"{interventionUpdateDto.Id}\" n'existe pas !");
+                return NotFound($"L'intervention avec l'Id \"{dto.Id}\" n'existe pas !");
             }
-            fdb.DateIntervention = interventionUpdateDto.DateIntervention;
-            fdb.TypeIntervention = interventionUpdateDto.TypeIntervention;
-            fdb.Description = interventionUpdateDto.Description;
-            fdb.Cout = interventionUpdateDto.Cout;
-            db.SaveChanges();
-            return Ok(new { msg = "Intervention Modifié", obj = fdb });
+            return Ok(new { msg = "Intervention Modifiée", obj = intervention });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIntervention(int id)
         {
-            var intervention = await db.Interventions.SingleOrDefaultAsync(a => a.Id == id);
-            if (intervention is null)
+            if (await _rep.Delete(id))
             {
-                return NotFound($"L'intervention avec l'Id:{id} n'exite pas !");
+                return Ok(new { msg = "L'intervention est supprimée !" });
             }
-            db.Remove(intervention);
-            db.SaveChanges();
-            return Ok(new { msg = "L'intervention est suprimé !" });
+            return NotFound($"L'intervention avec l'Id:{id} n'existe pas !");
         }
-
     }
 }

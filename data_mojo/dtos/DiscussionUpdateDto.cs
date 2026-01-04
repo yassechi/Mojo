@@ -5,16 +5,15 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_mojo.dtos
+namespace data_mojo.dtos
 {
-    public class VeloUpdateDto
+    public class DiscussionUpdateDto
     {
         public int Id { get; set; }
-        public string NumeroSerie { get; set; } = null!;
-        public string Marque { get; set; } = null!;
-        public string Modele { get; set; } = null!;
-        public decimal PrixAchat { get; set; }
+        public string Objet { get; set; } = null!;
         public bool Status { get; set; }
+        public DateTime DateCreation { get; set; }
+        public int UserId { get; set; }
 
     }
 }

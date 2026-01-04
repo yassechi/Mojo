@@ -1,8 +1,7 @@
-using data_mojo;
-using data_mojo.models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using api_mojo.dtos;
+using data_mojo.models;
+using data_mojo.dtos;
+using data_mojo.interfaces;
 
 namespace api_mojo.controllers
 {
@@ -10,22 +9,24 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class DiscussionController : ControllerBase
     {
-        private readonly AppDbContext db;
-        public DiscussionController(AppDbContext _db)
+        private readonly IRepository<Discussion, DiscussionAddDto, DiscussionUpdateDto> _rep;
+
+        public DiscussionController(IRepository<Discussion, DiscussionAddDto, DiscussionUpdateDto> rep)
         {
-            db = _db;
+            _rep = rep;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAllDiscussions()
         {
-            var discussion = await db.Discussions.ToListAsync();
-            return Ok(discussion);
+            var discussions = await _rep.GetAll();
+            return Ok(discussions);
         }
+
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetdiscussionById(int id)
+        public async Task<IActionResult> GetDiscussionById(int id)
         {
-            var discussion = await db.Discussions.SingleOrDefaultAsync(a => a.Id == id);
+            var discussion = await _rep.GetById(id);
             if (discussion is null)
             {
                 return NotFound($"La discussion avec l'Id:{id} n'existe pas !");
@@ -36,45 +37,29 @@ namespace api_mojo.controllers
         [HttpPost]
         public async Task<IActionResult> AddDiscussion(DiscussionAddDto discussionAddDto)
         {
-            Discussion discussion = new()
-            {
-                Objet = discussionAddDto.Objet,
-                Status = discussionAddDto.Status,
-                DateCreation = discussionAddDto.DateCreation,
-                UserId = discussionAddDto.UserId
-            };
-            await db.Discussions.AddAsync(discussion);
-            db.SaveChanges();
-            return Ok(new { msg = "Discussion Ajouté !", obj = discussion });
+            var discussion = await _rep.Add(discussionAddDto);
+            return Ok(new { msg = "Discussion Ajoutée !", obj = discussion });
         }
 
         [HttpPut]
         public async Task<IActionResult> UpadteDiscussion(DiscussionUpdateDto discussionUpdateDto)
         {
-            var fdb = await db.Discussions.SingleOrDefaultAsync(a => a.Id == discussionUpdateDto.Id);
-            if (fdb is null)
+            var discussion = await _rep.Upadte(discussionUpdateDto);
+            if (discussion is null)
             {
-                return NotFound($"Ce User \"{discussionUpdateDto.Id}\" n'existe pas !");
+                return NotFound($"La discussion avec l'ID \"{discussionUpdateDto.Id}\" n'existe pas !");
             }
-            fdb.Objet = discussionUpdateDto.Objet;
-            fdb.Status = discussionUpdateDto.Status;
-            fdb.DateCreation = discussionUpdateDto.DateCreation;
-            db.SaveChanges();
-            return Ok(new { msg = "Discussion Modifié", obj = fdb });
+            return Ok(new { msg = "Discussion Modifiée", obj = discussion });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDiscussion(int id)
         {
-            var discussion = await db.Discussions.SingleOrDefaultAsync(a => a.Id == id);
-            if (discussion is null)
+            if (await _rep.Delete(id))
             {
-                return NotFound($"La discussion avec l'Id:{id} n'exite pas !");
+                return Ok(new { msg = "La discussion est supprimée !" });
             }
-            db.Remove(discussion);
-            db.SaveChanges();
-            return Ok(new { msg = "La discussion est suprimé !" });
+            return NotFound($"La discussion avec l'Id:{id} n'existe pas !");
         }
-
     }
 }

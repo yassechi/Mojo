@@ -5,15 +5,13 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_mojo.dtos
+namespace data_mojo.dtos
 {
-    public class DiscussionUpdateDto
+    public class MessageAddDto
     {
-        public int Id { get; set; }
-        public string Objet { get; set; } = null!;
-        public bool Status { get; set; }
-        public DateTime DateCreation { get; set; }
+        public string Contenu { get; set; } = null!;
+        public DateTime DateEnvoi { get; set; }
         public int UserId { get; set; }
-
+        public int DiscussionId { get; set; }
     }
 }

@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_mojo.dtos
+namespace data_mojo.dtos
 {
-    public class ContratUpdateDto
+    public class ContratAddDto
     {
-        public int Id { get; set; }
         [Column(TypeName = "date")]
         public DateOnly DateDebut { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public DateOnly DateFin { get; set; }
@@ -18,6 +17,5 @@ namespace api_mojo.dtos
         public int VeloId { get; set; }
         public int BeneficiaireId { get; set; }
         public int UserRhId { get; set; }
-
     }
 }

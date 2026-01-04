@@ -1,8 +1,7 @@
-using data_mojo;
-using data_mojo.models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using api_mojo.dtos;
+using data_mojo.models;
+using data_mojo.dtos;
+using data_mojo.interfaces;
 
 namespace api_mojo.controllers
 {
@@ -10,23 +9,24 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class OrganisationController : ControllerBase
     {
-        private readonly AppDbContext db;
-        public OrganisationController(AppDbContext _db)
+        private readonly IRepository<Organisation, OrganisationAddDto, OrganisationUpdateDto> _rep;
+
+        public OrganisationController(IRepository<Organisation, OrganisationAddDto, OrganisationUpdateDto> rep)
         {
-            db = _db;
+            _rep = rep;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAllOrganisations()
         {
-            var organisation = await db.Organisations.ToListAsync();
-            return Ok(organisation);
+            var organisations = await _rep.GetAll();
+            return Ok(organisations);
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetOrganisationById(int id)
         {
-            var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Id == id);
+            var organisation = await _rep.GetById(id);
             if (organisation is null)
             {
                 return NotFound($"L'organisation avec l'Id:{id} n'existe pas !");
@@ -37,7 +37,7 @@ namespace api_mojo.controllers
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetOrganisationByName(string name)
         {
-            var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Name == name);
+            var organisation = await _rep.GetByName(name);
             if (organisation is null)
             {
                 return NotFound($"L'organisation {name} n'existe pas !");
@@ -46,50 +46,31 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddOrganisation(OrganisationAddDto OrganisationAddDto)
+        public async Task<IActionResult> AddOrganisation(OrganisationAddDto dto)
         {
-            Organisation organisation = new()
-            {
-                Name = OrganisationAddDto.Name,
-                Code = OrganisationAddDto.Code,
-                Address = OrganisationAddDto.Address,
-                ContactEmail = OrganisationAddDto.ContactEmail,
-                IsActif = OrganisationAddDto.IsActif
-            };
-            await db.Organisations.AddAsync(organisation);
-            db.SaveChanges();
-            return Ok(new { msg = "Organisation Ajouté !", obj = organisation });
+            var organisation = await _rep.Add(dto);
+            return Ok(new { msg = "Organisation Ajoutée !", obj = organisation });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteOrganisation(OrganisationUpdateDto organisationUpdateDto)
+        public async Task<IActionResult> UpadteOrganisation(OrganisationUpdateDto dto)
         {
-            var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Id == organisationUpdateDto.Id);
+            var organisation = await _rep.Upadte(dto);
             if (organisation is null)
             {
-                return NotFound($"Cet organisation \"{organisationUpdateDto.Name}\" n'existe pas !");
+                return NotFound($"L'organisation \"{dto.Name}\" n'existe pas !");
             }
-            organisation.Name = organisationUpdateDto.Name;
-            organisation.Code = organisationUpdateDto.Code;
-            organisation.Address = organisationUpdateDto.Address;
-            organisation.ContactEmail = organisationUpdateDto.ContactEmail;
-            organisation.IsActif = organisationUpdateDto.IsActif;
-            db.SaveChanges();
-            return Ok(new { msg = "Organisation Modifié", obj = organisation });
+            return Ok(new { msg = "Organisation Modifiée", obj = organisation });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganisation(int id)
         {
-            var organisation = await db.Organisations.SingleOrDefaultAsync(a => a.Id == id);
-            if (organisation is null)
+            if (await _rep.Delete(id))
             {
-                return NotFound($"L'organisation avec l'Id:{id} n'exite pas !");
+                return Ok(new { msg = "L'organisation est supprimée !" });
             }
-            db.Remove(organisation);
-            db.SaveChanges();
-            return Ok(new { msg = "L'organisation est suprimé !" });
+            return NotFound($"L'organisation avec l'Id:{id} n'existe pas !");
         }
-        
     }
 }

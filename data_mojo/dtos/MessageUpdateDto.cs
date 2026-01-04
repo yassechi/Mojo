@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_mojo.dtos
+namespace data_mojo.dtos
 {
     public class MessageUpdateDto
     {

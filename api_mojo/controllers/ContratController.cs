@@ -1,8 +1,7 @@
-using data_mojo;
-using data_mojo.models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using api_mojo.dtos;
+using data_mojo.models;
+using data_mojo.dtos;
+using data_mojo.interfaces;
 
 namespace api_mojo.controllers
 {
@@ -10,23 +9,24 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class ContratController : ControllerBase
     {
-        private readonly AppDbContext db;
-        public ContratController(AppDbContext _db)
+        private readonly IRepository<Contrat, ContratAddDto, ContratUpdateDto> _rep;
+
+        public ContratController(IRepository<Contrat, ContratAddDto, ContratUpdateDto> rep)
         {
-            db = _db;
+            _rep = rep;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAllContrat()
         {
-            var contrat = await db.Contrats.ToListAsync();
-            return Ok(contrat);
+            var contrats = await _rep.GetAll();
+            return Ok(contrats);
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetContratById(int id)
         {
-            var contrat = await db.Contrats.SingleOrDefaultAsync(a => a.Id == id);
+            var contrat = await _rep.GetById(id);
             if (contrat is null)
             {
                 return NotFound($"Le contrat avec l'Id:{id} n'existe pas !");
@@ -37,48 +37,31 @@ namespace api_mojo.controllers
         [HttpPost]
         public async Task<IActionResult> AddContrat(ContratAddDto contratAddDto)
         {
-            Contrat contrat = new()
-            {
-                DateDebut = contratAddDto.DateDebut,
-                DateFin = contratAddDto.DateFin,
-                LoyerMensuelHT = contratAddDto.LoyerMensuelHT,
-                StatutContrat = contratAddDto.StatutContrat,
-                VeloId = contratAddDto.VeloId,
-                BeneficiaireId = contratAddDto.BeneficiaireId,
-                UserRhId = contratAddDto.UserRhId
-            };
-            await db.Contrats.AddAsync(contrat);
-            db.SaveChanges();
+            var contrat = await _rep.Add(contratAddDto);
             return Ok(new { msg = "Contrat Ajouté !", obj = contrat });
         }
 
         [HttpPut]
         public async Task<IActionResult> UpadteContrat(ContratUpdateDto contratUpdateDto)
         {
-            var contrat = await db.Contrats.SingleOrDefaultAsync(a => a.Id == contratUpdateDto.Id);
+            // Note: On utilise 'Upadte' pour correspondre à ton interface
+            var contrat = await _rep.Upadte(contratUpdateDto);
             if (contrat is null)
             {
-                return NotFound($"Ce contrat \"{contratUpdateDto.Id}\" n'existe pas !");
+                return NotFound($"Ce contrat avec l'ID \"{contratUpdateDto.Id}\" n'existe pas !");
             }
-            contrat.DateDebut = contratUpdateDto.DateDebut;
-            contrat.DateFin = contratUpdateDto.DateFin;
-            contrat.LoyerMensuelHT = contratUpdateDto.LoyerMensuelHT;
-            contrat.StatutContrat = contratUpdateDto.StatutContrat;
-            db.SaveChanges();
             return Ok(new { msg = "Contrat Modifié", obj = contrat });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContrat(int id)
         {
-            var contrat = await db.Contrats.SingleOrDefaultAsync(a => a.Id == id);
-            if (contrat is null)
+            var success = await _rep.Delete(id);
+            if (success)
             {
-                return NotFound($"Le contrat avec l'Id:{id} n'exite pas !");
+                return Ok(new { msg = "Le contrat est supprimé !" });
             }
-            db.Remove(contrat);
-            db.SaveChanges();
-            return Ok(new { msg = "Le contrat est suprimé !" });
+            return NotFound($"Le contrat avec l'Id:{id} n'existe pas !");
         }
     }
 }
