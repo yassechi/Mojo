@@ -37,7 +37,8 @@ namespace data_mojo.repositories
                 Objet = discussionAddDto.Objet,
                 Status = discussionAddDto.Status,
                 DateCreation = discussionAddDto.DateCreation,
-                UserId = discussionAddDto.UserId
+                ClientId = discussionAddDto.ClientId,
+                MojoId = discussionAddDto.MojoId
             };
 
             await db.Discussions.AddAsync(discussion);

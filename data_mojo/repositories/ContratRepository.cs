@@ -39,8 +39,8 @@ namespace data_mojo.repositories
                 LoyerMensuelHT = contratAddDto.LoyerMensuelHT,
                 StatutContrat = contratAddDto.StatutContrat,
                 VeloId = contratAddDto.VeloId,
-                BeneficiaireId = contratAddDto.BeneficiaireId,
-                UserRhId = contratAddDto.UserRhId
+                BeneficiaireId = contratAddDto.BeneficiaireId.ToString(),
+                UserRhId = contratAddDto.UserRhId.ToString()
             };
 
             await db.Contrats.AddAsync(contrat);

@@ -21,7 +21,7 @@ namespace data_mojo.repositories
 
         public async Task<User?> GetById(int id)
         {
-            return await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return await db.Users.FirstOrDefaultAsync(u => u.Id == id.ToString());
         }
 
         public async Task<User?> GetByName(string name)

@@ -36,7 +36,6 @@ namespace data_mojo.repositories
             {
                 Contenu = dto.Contenu,
                 DateEnvoi = dto.DateEnvoi,
-                UserId = dto.UserId,
                 DiscussionId = dto.DiscussionId
             };
 

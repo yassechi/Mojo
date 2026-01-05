@@ -11,7 +11,7 @@ namespace data_mojo.models
     public class User : IdentityUser
     {
         [Key]
-        public int Id { get; set; }
+        // public int Id { get; set; }
         public string FirstName { get; set; } = null!;
         public string LasttName { get; set; } = null!;
         // public string Email { get; set; } = null!;
@@ -28,7 +28,6 @@ namespace data_mojo.models
 
         // Pour le chef "1" : les contrats qu'il gère
         public virtual List<Contrat> ContratsGeres { get; set; } = new();
-        public List<Message> Messages = [];
         public List<Discussion> Discussions = [];
         
     }

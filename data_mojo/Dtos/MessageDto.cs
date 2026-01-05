@@ -5,7 +5,7 @@ namespace data_mojo.dtos
     {
         public string Contenu { get; set; } = null!;
         public DateTime DateEnvoi { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int DiscussionId { get; set; }
     }
 
@@ -14,7 +14,7 @@ namespace data_mojo.dtos
         public int Id { get; set; }
         public string Contenu { get; set; } = null!;
         public DateTime DateEnvoi { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int DiscussionId { get; set; }
 
     }

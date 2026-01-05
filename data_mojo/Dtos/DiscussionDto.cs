@@ -6,7 +6,8 @@ namespace data_mojo.dtos
         public string Objet { get; set; } = null!;
         public bool Status { get; set; }
         public DateTime DateCreation { get; set; }
-        public int UserId { get; set; }
+        public string ClientId { get; set; } = null!;
+        public string MojoId { get; set; } = null!;
     }
 
     public class DiscussionUpdateDto
@@ -15,7 +16,15 @@ namespace data_mojo.dtos
         public string Objet { get; set; } = null!;
         public bool Status { get; set; }
         public DateTime DateCreation { get; set; }
-        public int UserId { get; set; }
-
+        public string ClientId { get; set; } = null!;
+        public string MojoId { get; set; } = null!;
     }
 }
+
+//    [ForeignKey(nameof(User))]
+//         public string ClientId { get; set; }
+//         public User? Client { get; set; } = null!;
+
+//         [ForeignKey(nameof(User))]
+//         public string MojoId { get; set; } = null!;
+//         public User? Mojo { get; set; }

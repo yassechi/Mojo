@@ -22,16 +22,13 @@ namespace data_mojo.models
         [ForeignKey(nameof(Velo))]
         public int VeloId { get; set; }
         public Velo? Velo { get; set; }
-        
-        // Remplace public List<Accessoire> Accessoires = []; par :
-        public virtual List<Accessoire> Accessoires { get; set; } = [];
 
         // LIEN 1 : L'utilisateur standard (Bénéficiaire - le "0")
-        public int BeneficiaireId { get; set; }
+        public string BeneficiaireId { get; set; }
         public virtual User Beneficiaire { get; set; } = null!;
 
         // LIEN 2 : Le Chef (User RH - le "1")
-        public int UserRhId { get; set; }
+        public string UserRhId { get; set; }
         public virtual User UserRH { get; set; } = null!;
     }
 }

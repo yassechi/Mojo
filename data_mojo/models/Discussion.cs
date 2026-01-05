@@ -16,8 +16,12 @@ namespace data_mojo.models
         public DateTime DateCreation { get; set; }
 
         [ForeignKey(nameof(User))]
-        public int UserId { get; set; }
-        public User? User { get; set; }
+        public string ClientId { get; set; } = null!;
+        public User? Client { get; set; } = null!;
+
+        [ForeignKey(nameof(User))]
+        public string MojoId { get; set; } = null!;
+        public User? Mojo { get; set; }
 
         public List<Message> Messages = [];
     }

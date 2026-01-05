@@ -25,7 +25,6 @@ builder.Services.AddDbContext<AppDbContext>(op =>
 op.UseSqlServer(builder.Configuration.GetConnectionString("connect")));
 
 // Repositories
-builder.Services.AddScoped<IRepository<Accessoire, AccessoireAddDto, AccessoireUpdateDto>, AccessoireRepository>();
 builder.Services.AddScoped<IRepository<Amortissement, AmortissmentAddDto, AmortissmentUpdateDto>, AmortissementRepository>();
 builder.Services.AddScoped<IRepository<Contrat, ContratAddDto, ContratUpdateDto>, ContratRepository>();
 builder.Services.AddScoped<IRepository<Discussion, DiscussionAddDto, DiscussionUpdateDto>, DiscussionRepository>();

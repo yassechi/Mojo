@@ -14,10 +14,6 @@ namespace data_mojo.models
         public string Contenu { get; set; } = null!;
         public DateTime DateEnvoi { get; set; }
 
-        [ForeignKey(nameof(User))]
-        public int UserId { get; set; }
-        public User? User { get; set; }
-
         [ForeignKey(nameof(Discussion))]
         public int DiscussionId { get; set; }
         public Discussion? Discussion { get; set; }
