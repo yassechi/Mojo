@@ -26,7 +26,7 @@ namespace data_mojo.repositories
 
         public async Task<User?> GetByName(string name)
         {
-            // Recherche par nom de famille (LasttName)
+            // Recherche par nom de famille 
             return await db.Users.FirstOrDefaultAsync(u => u.LasttName == name);
         }
 
@@ -37,9 +37,9 @@ namespace data_mojo.repositories
                 FirstName = dto.FirstName,
                 LasttName = dto.LasttName,
                 Email = dto.Email,
-                Hpassword = dto.Hpassword,
+                Password = dto.Password,
                 Role = dto.Role,
-                TailleCm = dto.TailleCm,
+                TailleCm = dto.TailleCm ?? 0,
                 IsActif = dto.IsActif,
                 OrganisationId = dto.OrganisationId
             };
@@ -58,10 +58,11 @@ namespace data_mojo.repositories
             user.FirstName = dto.FirstName;
             user.LasttName = dto.LasttName;
             user.Email = dto.Email;
-            user.Hpassword = dto.Hpassword;
+            user.Password = dto.Password;
             user.Role = dto.Role;
             user.TailleCm = dto.TailleCm;
             user.IsActif = dto.IsActif;
+            user.PhoneNumber = dto.PhoneNumber;
 
             await db.SaveChangesAsync();
             return user;

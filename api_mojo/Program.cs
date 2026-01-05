@@ -5,8 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using data_mojo.dtos;
 using data_mojo.interfaces;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Identity
+builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
 
 // Pour les Includes Pour ne pas rentrer dans les sycles ..
 // builder.Services.AddControllers();

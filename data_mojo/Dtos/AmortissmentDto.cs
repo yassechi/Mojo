@@ -22,6 +22,5 @@ namespace data_mojo.dtos
         [Column(TypeName = "decimal(10,2)")]
         public decimal ValeurResiduelleFinale { get; set; }
         public int VeloId { get; set; }
-
     }
 }
