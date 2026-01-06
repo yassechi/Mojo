@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using data_mojo.models;
-using data_mojo.dtos;
-using data_mojo.interfaces;
+using core_mojo.models;
+using core_mojo.interfaces;
+using core_mojo.interfaces;
+using core_mojo.Dtos;
 
 namespace api_mojo.controllers
 {

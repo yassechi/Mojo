@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using data_mojo.dtos;
-using data_mojo.models;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using core_mojo.models;
+using core_mojo.interfaces;
+using System.Text;
+using core_mojo.Dtos;
 
 namespace api_mojo.Controllers
 {
@@ -65,21 +60,22 @@ namespace api_mojo.Controllers
         {
             if (ModelState.IsValid)
             {
-                User? user = await userManager.FindByNameAsync(login.UserName);
+                var user = await userManager.FindByNameAsync(login.UserName);
                 if (user is not null)
                 {
                     if (await userManager.CheckPasswordAsync(user, login.Password))
                     {
                         var claims = new List<Claim>();
-                        claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+                        claims.Add(new Claim(ClaimTypes.Name, user.UserName!));
                         claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
                         claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-                        var roles = await userManager.GetRolesAsync(user);
-                        foreach (var item in roles)
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, item));
-                        }
-                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SecretKey"]));
+                        // var roles = await userManager.GetRolesAsync(user);
+                        // foreach (var item in roles)
+                        // {
+                        //     claims.Add(new Claim(ClaimTypes.Role, item));
+                        // }
+                        claims.Add(new Claim("role", user.Role.ToString()));
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SecretKey"]!));
                         var sc = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
                         var token = new JwtSecurityToken(
                             issuer: config["JWT:Issuer"],

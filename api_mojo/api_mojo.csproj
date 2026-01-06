@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\data_mojo\data_mojo.csproj" />
+    <ProjectReference Include="..\core_mojo\core_mojo.csproj" />
+    <ProjectReference Include="..\infrastructure_mojo\infrastructure_mojo.csproj" />
   </ItemGroup>
 
 </Project>

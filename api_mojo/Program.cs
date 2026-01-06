@@ -1,30 +1,36 @@
-using data_mojo;
-using data_mojo.models;
-using data_mojo.repositories;
 using Microsoft.EntityFrameworkCore;
-using data_mojo.dtos;
-using data_mojo.interfaces;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
+using api_mojo.Extensions;
+using core_mojo.models;      // Assure-toi que le 'M' est majuscule si c'est le cas dans ton dossier
+using core_mojo.interfaces;        // Pour les DTOs // Pour IRepository
+using core_mojo.Dtos;
+using core_mojo;
+using infrastructure_mojo.repositories;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Identity
-builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+// --- IDENTITY ---
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>();
 
-// Pour les Includes Pour ne pas rentrer dans les sycles ..
-// builder.Services.AddControllers();
+// --- AUTHENTICATION (JWT) ---
+builder.Services.AddCustomJwtAut(builder.Configuration);
+
+// --- CONTROLLERS & JSON ---
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// DB
+// --- DATABASE ---
 builder.Services.AddDbContext<AppDbContext>(op =>
-op.UseSqlServer(builder.Configuration.GetConnectionString("connect")));
+    op.UseSqlServer(builder.Configuration.GetConnectionString("connect")));
 
-// Repositories
+// --- REPOSITORIES INJECTION ---
 builder.Services.AddScoped<IRepository<Amortissement, AmortissmentAddDto, AmortissmentUpdateDto>, AmortissementRepository>();
 builder.Services.AddScoped<IRepository<Contrat, ContratAddDto, ContratUpdateDto>, ContratRepository>();
 builder.Services.AddScoped<IRepository<Discussion, DiscussionAddDto, DiscussionUpdateDto>, DiscussionRepository>();
@@ -34,13 +40,12 @@ builder.Services.AddScoped<IRepository<Organisation, OrganisationAddDto, Organis
 builder.Services.AddScoped<IRepository<User, UserAddDto, UserUpdateDto>, UserRepository>();
 builder.Services.AddScoped<IRepository<Velo, VeloAddDto, VeloUpdateDto>, VeloRepository>();
 
-// Swagger
+// --- SWAGGER ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,8 +53,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-// app.UseAuthorization();
+app.UseAuthentication(); 
+app.UseAuthorization();  
+
 app.MapControllers();
 
 app.Run();
-

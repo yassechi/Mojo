@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using data_mojo.models;
-using data_mojo.dtos;
-using data_mojo.interfaces;
+using core_mojo.models;
+using core_mojo.interfaces;
+using core_mojo.interfaces;
+using core_mojo.Dtos;
 
 namespace api_mojo.controllers
 {
@@ -23,6 +24,7 @@ namespace api_mojo.controllers
             return Ok(users);
         }
 
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -33,6 +35,18 @@ namespace api_mojo.controllers
             }
             return Ok(new { obj = user });
         }
+        
+        // [HttpGet("{id}")]
+        // public async Task<IActionResult> GetUserById(string id)
+        // {
+        //     var user = await _rep.GetById2(id);
+        //     if (user is null)
+        //     {
+        //         return NotFound($"Le user avec l'Id:{id} n'existe pas !");
+        //     }
+        //     return Ok(new { obj = user });
+        // }
+
 
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetUserByName(string name)
