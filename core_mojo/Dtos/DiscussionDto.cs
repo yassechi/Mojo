@@ -20,11 +20,3 @@ namespace core_mojo.Dtos
         public string MojoId { get; set; } = null!;
     }
 }
-
-//    [ForeignKey(nameof(User))]
-//         public string ClientId { get; set; }
-//         public User? Client { get; set; } = null!;
-
-//         [ForeignKey(nameof(User))]
-//         public string MojoId { get; set; } = null!;
-//         public User? Mojo { get; set; }

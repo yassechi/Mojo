@@ -1,7 +1,6 @@
+using infrastructure_mojo.repositories;
 using Microsoft.AspNetCore.Mvc;
 using core_mojo.models;
-using core_mojo.interfaces;
-using core_mojo.interfaces;
 using core_mojo.Dtos;
 
 namespace api_mojo.controllers
@@ -10,9 +9,9 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class AmortissementController : ControllerBase
     {
-        private readonly IRepository<Amortissement, AmortissmentAddDto, AmortissmentUpdateDto> _rep;
+        private readonly AmortissementRepository _rep;
 
-        public AmortissementController(IRepository<Amortissement, AmortissmentAddDto, AmortissmentUpdateDto> rep)
+        public AmortissementController(AmortissementRepository rep)
         {
             _rep = rep;
         }
@@ -38,15 +37,33 @@ namespace api_mojo.controllers
         [HttpPost]
         public async Task<IActionResult> AddAmortissements(AmortissmentAddDto amortDto)
         {
-            var amortissement = await _rep.Add(amortDto);
+            Amortissement amortissement = new()
+            {
+                DateDebut = amortDto.DateDebut,
+                ValeurInit = amortDto.ValeurInit,
+                DureeMois = amortDto.DureeMois,
+                ValeurResiduelleFinale = amortDto.ValeurResiduelleFinale,
+                VeloId = amortDto.VeloId
+            };
+            await _rep.Add(amortissement);
             return Ok(new { message = "Amortissement Ajouté !", obj = amortissement });
         }
 
         [HttpPut]
         public async Task<IActionResult> UpadteAmortissement(AmortissmentUpdateDto amortissementDto)
         {
-            var amortissement = await _rep.Upadte(amortissementDto);
+            var amortissement = await _rep.GetById(amortissementDto.Id);
             if (amortissement is null)
+            {
+                return NotFound($"Cet Amortissement avec l'ID \"{amortissementDto.Id}\" n'existe pas !");
+                
+            }
+            amortissement.DateDebut = amortissementDto.DateDebut;
+            amortissement.ValeurInit = amortissementDto.ValeurInit;
+            amortissement.DureeMois = amortissementDto.DureeMois;
+            amortissement.ValeurResiduelleFinale = amortissementDto.ValeurResiduelleFinale;
+            var updated = await _rep.Upadte(amortissement);
+            if (updated is null)
             {
                 return NotFound($"Cet amortissement \"{amortissementDto.Id}\" n'existe pas !");
             }

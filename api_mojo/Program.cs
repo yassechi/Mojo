@@ -1,46 +1,43 @@
-using Microsoft.EntityFrameworkCore;
+using infrastructure_mojo.repositories;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using api_mojo.Extensions;
-using core_mojo.models;      // Assure-toi que le 'M' est majuscule si c'est le cas dans ton dossier
-using core_mojo.interfaces;        // Pour les DTOs // Pour IRepository
-using core_mojo.Dtos;
+using core_mojo.models;
 using core_mojo;
-using infrastructure_mojo.repositories;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- IDENTITY ---
+// Identity
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-// --- AUTHENTICATION (JWT) ---
+// Jwt
 builder.Services.AddCustomJwtAut(builder.Configuration);
 
-// --- CONTROLLERS & JSON ---
+// controllers
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// --- DATABASE ---
+// database
 builder.Services.AddDbContext<AppDbContext>(op =>
     op.UseSqlServer(builder.Configuration.GetConnectionString("connect")));
 
-// --- REPOSITORIES INJECTION ---
-builder.Services.AddScoped<IRepository<Amortissement, AmortissmentAddDto, AmortissmentUpdateDto>, AmortissementRepository>();
-builder.Services.AddScoped<IRepository<Contrat, ContratAddDto, ContratUpdateDto>, ContratRepository>();
-builder.Services.AddScoped<IRepository<Discussion, DiscussionAddDto, DiscussionUpdateDto>, DiscussionRepository>();
-builder.Services.AddScoped<IRepository<Intervention, InterventionAddDto, InterventionUpdateDto>, InterventionRepository>();
-builder.Services.AddScoped<IRepository<Message, MessageAddDto, MessageUpdateDto>, MessageRepository>();
-builder.Services.AddScoped<IRepository<Organisation, OrganisationAddDto, OrganisationUpdateDto>, OrganisationRepository>();
-builder.Services.AddScoped<IRepository<User, UserAddDto, UserUpdateDto>, UserRepository>();
-builder.Services.AddScoped<IRepository<Velo, VeloAddDto, VeloUpdateDto>, VeloRepository>();
+// Enregistrement du repository
+builder.Services.AddScoped<AmortissementRepository>();
+builder.Services.AddScoped<ContratRepository>();
+builder.Services.AddScoped<DiscussionRepository>();
+builder.Services.AddScoped<InterventionRepository>();
+builder.Services.AddScoped<MessageRepository>();
+builder.Services.AddScoped<OrganisationRepository>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<VeloRepository>();
 
-// --- SWAGGER ---
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

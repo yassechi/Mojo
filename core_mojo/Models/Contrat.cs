@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace core_mojo.models
 
@@ -22,15 +17,9 @@ namespace core_mojo.models
         [ForeignKey(nameof(Velo))]
         public int VeloId { get; set; }
         public Velo? Velo { get; set; }
-
-        // LIEN 1 : L'utilisateur standard (Bénéficiaire - le "0")
         public string BeneficiaireId { get; set; } = null!;
-
         public virtual User Beneficiaire { get; set; } = null!;
-
-        // LIEN 2 : Le Chef (User RH - le "1")
         public string UserRhId { get; set; } = null!;
-
         public virtual User UserRH { get; set; } = null!;
     }
 }

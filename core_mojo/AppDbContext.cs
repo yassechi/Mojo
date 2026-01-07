@@ -26,38 +26,33 @@ namespace core_mojo
         {
             base.OnModelCreating(modelBuilder);
 
-            // LIEN 1 : L'utilisateur standard (Bénéficiaire)
+            // Bénéficiaire
             modelBuilder.Entity<Contrat>()
                 .HasOne(c => c.Beneficiaire)
                 .WithMany(u => u.ContratsRecus)
                 .HasForeignKey(c => c.BeneficiaireId)
                 .OnDelete(DeleteBehavior.Restrict); // On empêche la suppression automatique
 
-            // LIEN 2 : Le Chef (User RH)
+            // Manager
             modelBuilder.Entity<Contrat>()
                 .HasOne(c => c.UserRH)
                 .WithMany(u => u.ContratsGeres)
                 .HasForeignKey(c => c.UserRhId)
-                .OnDelete(DeleteBehavior.Restrict); // On empêche la suppression automatique
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             modelBuilder.Entity<Discussion>()
-                    .HasOne(d => d.Client) // ou le nom de votre propriété de navigation
+                    .HasOne(d => d.Client)
                     .WithMany()
                     .HasForeignKey(d => d.ClientId)
-                    .OnDelete(DeleteBehavior.Restrict); // Désactive le cascade sur le client
+                    .OnDelete(DeleteBehavior.Restrict); 
 
             modelBuilder.Entity<Discussion>()
-                .HasOne(d => d.Mojo) // ou le nom de votre propriété de navigation
+                .HasOne(d => d.Mojo) 
                 .WithMany()
                 .HasForeignKey(d => d.MojoId)
                 .OnDelete(DeleteBehavior.Restrict);
-            // --- RELATION MESSAGE (L'erreur actuelle) ---
-            // modelBuilder.Entity<Message>()
-            //     .HasOne(m => m.User)
-            //     .WithMany(u => u.Messages) // On va corriger la liste dans User.cs juste après
-            //     .HasForeignKey(m => m.UserId)
-            //     .OnDelete(DeleteBehavior.Restrict); // <--- AJOUTE CETTE LIGNE
+
         }
     }
 }

@@ -1,74 +1,14 @@
+using infrastructure_mojo.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using core_mojo;             // Pour AppDbContext
-using core_mojo.models;      // 'm' minuscule comme dans tes fichiers
-using core_mojo.Dtos;        // 'D' majuscule (vérifie si c'est dtos ou Dtos chez toi)
-using core_mojo.interfaces;  // 'i' minuscule comme vu dans ton IRepository.cs
+using core_mojo.models;
+using core_mojo.Dtos;
+using core_mojo;
 
 namespace infrastructure_mojo.repositories
 {
-    public class DiscussionRepository : IRepository<Discussion, DiscussionAddDto, DiscussionUpdateDto>
+    public class DiscussionRepository : Repository<Discussion>, IDiscussion
     {
-        private readonly AppDbContext db;
+        public DiscussionRepository(AppDbContext context) : base(context) {}
 
-        public DiscussionRepository(AppDbContext _db)
-        {
-            db = _db;
-        }
-
-        public async Task<List<Discussion>> GetAll()
-        {
-            return await db.Discussions.ToListAsync();
-        }
-
-        public async Task<Discussion?> GetById(int id)
-        {
-            return await db.Discussions.FirstOrDefaultAsync(d => d.Id == id);
-        }
-
-        public async Task<Discussion?> GetByName(string name)
-        {
-            // Recherche par l'objet de la discussion
-            return await db.Discussions.FirstOrDefaultAsync(d => d.Objet == name);
-        }
-
-        public async Task<Discussion> Add(DiscussionAddDto discussionAddDto)
-        {
-            Discussion discussion = new()
-            {
-                Objet = discussionAddDto.Objet,
-                Status = discussionAddDto.Status,
-                DateCreation = discussionAddDto.DateCreation,
-                ClientId = discussionAddDto.ClientId,
-                MojoId = discussionAddDto.MojoId
-            };
-
-            await db.Discussions.AddAsync(discussion);
-            await db.SaveChangesAsync();
-            return discussion;
-        }
-
-        public async Task<Discussion?> Upadte(DiscussionUpdateDto discussionUpdateDto)
-        {
-            var discussion = await db.Discussions.FindAsync(discussionUpdateDto.Id);
-
-            if (discussion == null) return null;
-
-            discussion.Objet = discussionUpdateDto.Objet;
-            discussion.Status = discussionUpdateDto.Status;
-            discussion.DateCreation = discussionUpdateDto.DateCreation;
-
-            await db.SaveChangesAsync();
-            return discussion;
-        }
-
-        public async Task<bool> Delete(int id)
-        {
-            var discussion = await db.Discussions.FindAsync(id);
-            if (discussion == null) return false;
-
-            db.Discussions.Remove(discussion);
-            await db.SaveChangesAsync();
-            return true;
-        }
     }
 }

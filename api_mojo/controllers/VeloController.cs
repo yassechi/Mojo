@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using core_mojo.models;
-using core_mojo.interfaces;
-using core_mojo.interfaces;
+using infrastructure_mojo.repositories;
 using core_mojo.Dtos;
 
 namespace api_mojo.controllers
@@ -10,9 +9,9 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class VeloController : ControllerBase
     {
-        private readonly IRepository<Velo, VeloAddDto, VeloUpdateDto> _rep;
+        private readonly VeloRepository _rep;
 
-        public VeloController(IRepository<Velo, VeloAddDto, VeloUpdateDto> rep)
+        public VeloController(VeloRepository rep)
         {
             _rep = rep;
         }
@@ -36,24 +35,55 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddVelo(VeloAddDto veloAddDto)
+        public async Task<IActionResult> AddVelo(VeloAddDto dto)
         {
-            var velo = await _rep.Add(veloAddDto);
-            return Ok(new { msg = "Velo Ajouté !", obj = velo });
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            Velo velo = new Velo
+            {
+                NumeroSerie = dto.NumeroSerie,
+                Marque = dto.Marque,
+                Modele = dto.Modele,
+                PrixAchat = dto.PrixAchat,
+                Status = dto.Status
+            };
+
+            var result = await _rep.Add(velo);
+            
+            if (result != null)
+            {
+                return Ok(new { msg = "Velo Ajouté !", obj = result });
+            }
+            return BadRequest("L'ajout du vélo a échoué.");
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteVelo(VeloUpdateDto veloUpdateDto)
+        public async Task<IActionResult> UpadteVelo(VeloUpdateDto dto)
         {
-            var velo = await _rep.Upadte(veloUpdateDto);
-            if (velo is null)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var veloToUpdate = await _rep.GetById(dto.Id);
+            if (veloToUpdate is null)
             {
-                return NotFound($"Ce velo avec l'Id \"{veloUpdateDto.Id}\" n'existe pas !");
+                return NotFound($"Ce velo avec l'Id \"{dto.Id}\" n'existe pas !");
             }
-            return Ok(new { msg = "Velo Modifié", obj = velo });
+
+            veloToUpdate.NumeroSerie = dto.NumeroSerie;
+            veloToUpdate.Marque = dto.Marque;
+            veloToUpdate.Modele = dto.Modele;
+            veloToUpdate.PrixAchat = dto.PrixAchat;
+            veloToUpdate.Status = dto.Status;
+
+            var result = await _rep.Upadte(veloToUpdate);
+            
+            if (result != null)
+            {
+                return Ok(new { msg = "Velo Modifié", obj = result });
+            }
+            return BadRequest("La modification a échoué.");
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteVelo(int id)
         {
             if (await _rep.Delete(id))

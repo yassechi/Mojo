@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using core_mojo.models;
-using core_mojo.interfaces;
-using core_mojo.interfaces;
 using core_mojo.Dtos;
+using infrastructure_mojo.repositories;
 
 namespace api_mojo.controllers
 {
@@ -10,11 +9,15 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class ContratController : ControllerBase
     {
-        private readonly IRepository<Contrat, ContratAddDto, ContratUpdateDto> _rep;
+        private readonly ContratRepository _rep;
+        private readonly VeloRepository _veloRep;
+        private readonly UserRepository _userRep;
 
-        public ContratController(IRepository<Contrat, ContratAddDto, ContratUpdateDto> rep)
+        public ContratController(ContratRepository rep, VeloRepository veloRep, UserRepository userRep)
         {
             _rep = rep;
+            _veloRep = veloRep;
+            _userRep = userRep;
         }
 
         [HttpGet]
@@ -36,29 +39,64 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddContrat(ContratAddDto contratAddDto)
+        public async Task<IActionResult> AddContrat(ContratAddDto dto)
         {
-            var contrat = await _rep.Add(contratAddDto);
-            return Ok(new { msg = "Contrat Ajouté !", obj = contrat });
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var velo = await _veloRep.GetById(dto.VeloId);
+            if (velo is null) return BadRequest("Le vélo spécifié n'existe pas.");
+
+            var beneficiaire = await _userRep.GetById2(dto.BeneficiaireId.ToString());
+            var userRh = await _userRep.GetById2(dto.UserRhId.ToString());
+            
+            if (beneficiaire is null || userRh is null) 
+                return BadRequest("L'un des utilisateurs (Bénéficiaire ou RH) n'existe pas.");
+
+            Contrat contrat = new Contrat
+            {
+                DateDebut = dto.DateDebut,
+                DateFin = dto.DateFin,
+                LoyerMensuelHT = dto.LoyerMensuelHT,
+                StatutContrat = dto.StatutContrat,
+                VeloId = dto.VeloId,
+                BeneficiaireId = dto.BeneficiaireId.ToString(),
+                UserRhId = dto.UserRhId.ToString()
+            };
+
+            var result = await _rep.Add(contrat);
+            return Ok(new { msg = "Contrat Ajouté !", obj = result });
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteContrat(ContratUpdateDto contratUpdateDto)
+        public async Task<IActionResult> UpadteContrat(ContratUpdateDto dto)
         {
-            // Note: On utilise 'Upadte' pour correspondre à ton interface
-            var contrat = await _rep.Upadte(contratUpdateDto);
-            if (contrat is null)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var contratToUpdate = await _rep.GetById(dto.Id);
+            if (contratToUpdate is null)
             {
-                return NotFound($"Ce contrat avec l'ID \"{contratUpdateDto.Id}\" n'existe pas !");
+                return NotFound($"Ce contrat avec l'ID \"{dto.Id}\" n'existe pas !");
             }
-            return Ok(new { msg = "Contrat Modifié", obj = contrat });
+
+            var velo = await _veloRep.GetById(dto.VeloId);
+            if (velo is null) return BadRequest("Le vélo spécifié n'existe pas.");
+
+            contratToUpdate.DateDebut = dto.DateDebut;
+            contratToUpdate.DateFin = dto.DateFin;
+            contratToUpdate.LoyerMensuelHT = dto.LoyerMensuelHT;
+            contratToUpdate.StatutContrat = dto.StatutContrat;
+            contratToUpdate.VeloId = dto.VeloId;
+            contratToUpdate.BeneficiaireId = dto.BeneficiaireId.ToString();
+            contratToUpdate.UserRhId = dto.UserRhId.ToString();
+
+            var result = await _rep.Upadte(contratToUpdate);
+            return Ok(new { msg = "Contrat Modifié", obj = result });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteContrat(int id)
         {
-            var success = await _rep.Delete(id);
-            if (success)
+            if (await _rep.Delete(id))
             {
                 return Ok(new { msg = "Le contrat est supprimé !" });
             }

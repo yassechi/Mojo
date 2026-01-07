@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using core_mojo.models;
-using core_mojo.interfaces;
-using System.Text;
 using core_mojo.Dtos;
+using System.Text;
 
 namespace api_mojo.Controllers
 {

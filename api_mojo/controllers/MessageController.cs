@@ -1,7 +1,6 @@
+using infrastructure_mojo.repositories;
 using Microsoft.AspNetCore.Mvc;
 using core_mojo.models;
-using core_mojo.interfaces;
-using core_mojo.interfaces;
 using core_mojo.Dtos;
 
 namespace api_mojo.controllers
@@ -10,11 +9,13 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class MessageController : ControllerBase
     {
-        private readonly IRepository<Message, MessageAddDto, MessageUpdateDto> _rep;
+        private readonly MessageRepository _rep;
+        private readonly DiscussionRepository _discussionRep;
 
-        public MessageController(IRepository<Message, MessageAddDto, MessageUpdateDto> rep)
+        public MessageController(MessageRepository rep, DiscussionRepository discussionRep)
         {
-            _rep = rep;
+            _rep = rep; 
+            _discussionRep = discussionRep;
         }
 
         [HttpGet]
@@ -36,24 +37,57 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMsg(MessageAddDto messageAddDto)
+        public async Task<IActionResult> AddMsg(MessageAddDto dto)
         {
-            var message = await _rep.Add(messageAddDto);
-            return Ok(new { msg = "Message Ajouté !", obj = message });
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var discussion = await _discussionRep.GetById(dto.DiscussionId);
+            if (discussion is null)
+            {
+                return BadRequest($"La discussion avec l'Id {dto.DiscussionId} n'existe pas.");
+            }
+
+            Message message = new()
+            {
+                Contenu = dto.Contenu,
+                DateEnvoi = dto.DateEnvoi,
+                DiscussionId = dto.DiscussionId
+            };
+
+            var msg = await _rep.Add(message);
+
+            if (msg is not null)
+            {
+                return Ok(new { message = "Message Ajouté !", obj = msg });
+            }
+            return BadRequest($"L'ajout du message du {dto.DateEnvoi} a échoué.");
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteMessage(MessageUpdateDto messageUpdateDto)
+        public async Task<IActionResult> UpadteMessage(MessageUpdateDto dto)
         {
-            var message = await _rep.Upadte(messageUpdateDto);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var message = await _rep.GetById(dto.Id);
+
             if (message is null)
             {
-                return NotFound($"Le message avec l'Id \"{messageUpdateDto.Id}\" n'existe pas !");
+                return NotFound($"Le message avec l'Id {dto.Id} n'existe pas.");
             }
-            return Ok(new { msg = "Message Modifié", obj = message });
+
+            message.Contenu = dto.Contenu;
+            message.DateEnvoi = dto.DateEnvoi;
+
+            var msgUpdate = await _rep.Upadte(message);
+            if (msgUpdate is not null)
+            {
+                return Ok(new { message = "Message modifié avec succès.", obj = msgUpdate });
+            }
+            
+            return BadRequest($"La modification du message a échoué.");
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteMessage(int id)
         {
             if (await _rep.Delete(id))

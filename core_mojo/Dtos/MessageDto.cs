@@ -6,7 +6,6 @@ namespace core_mojo.Dtos
         public string Contenu { get; set; } = null!;
         public DateTime DateEnvoi { get; set; }
         public string UserId { get; set; } = null!;
-
         public int DiscussionId { get; set; }
     }
 
@@ -16,7 +15,6 @@ namespace core_mojo.Dtos
         public string Contenu { get; set; } = null!;
         public DateTime DateEnvoi { get; set; }
         public string UserId { get; set; } = null!;
-
         public int DiscussionId { get; set; }
 
     }

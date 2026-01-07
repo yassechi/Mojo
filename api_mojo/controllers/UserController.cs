@@ -1,7 +1,6 @@
+using infrastructure_mojo.repositories;
 using Microsoft.AspNetCore.Mvc;
 using core_mojo.models;
-using core_mojo.interfaces;
-using core_mojo.interfaces;
 using core_mojo.Dtos;
 
 namespace api_mojo.controllers
@@ -10,11 +9,13 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IRepository<User, UserAddDto, UserUpdateDto> _rep;
+        private readonly UserRepository _rep;
+        private readonly OrganisationRepository _orgRep;
 
-        public UserController(IRepository<User, UserAddDto, UserUpdateDto> rep)
+        public UserController(UserRepository rep, OrganisationRepository orgRep)
         {
             _rep = rep;
+            _orgRep = orgRep;
         }
 
         [HttpGet]
@@ -24,29 +25,16 @@ namespace api_mojo.controllers
             return Ok(users);
         }
 
-
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUserById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(string id)
         {
-            var user = await _rep.GetById(id);
+            var user = await _rep.GetById2(id);
             if (user is null)
             {
                 return NotFound($"Le user avec l'Id:{id} n'existe pas !");
             }
             return Ok(new { obj = user });
         }
-        
-        // [HttpGet("{id}")]
-        // public async Task<IActionResult> GetUserById(string id)
-        // {
-        //     var user = await _rep.GetById2(id);
-        //     if (user is null)
-        //     {
-        //         return NotFound($"Le user avec l'Id:{id} n'existe pas !");
-        //     }
-        //     return Ok(new { obj = user });
-        // }
-
 
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetUserByName(string name)
@@ -60,21 +48,75 @@ namespace api_mojo.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser(UserAddDto userAddDto)
+        public async Task<IActionResult> AddUser(UserAddDto dto)
         {
-            var user = await _rep.Add(userAddDto);
-            return Ok(new { message = "User Ajouté !", obj = user });
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var organisation = await _orgRep.GetById(dto.OrganisationId);
+            if (organisation is null)
+            {
+                return BadRequest($"L'organisation avec l'Id {dto.OrganisationId} n'existe pas.");
+            }
+
+            User user = new()
+            {
+                FirstName = dto.FirstName,
+                LasttName = dto.LasttName,
+                Email = dto.Email,
+                Password = dto.Password,
+                Role = dto.Role,
+                TailleCm = dto.TailleCm ?? 0,
+                IsActif = dto.IsActif,
+                OrganisationId = dto.OrganisationId,
+                UserName = dto.UserName,
+                PhoneNumber = dto.PhoneNumber
+            };
+
+            var us = await _rep.Add(user);
+
+            if (us is not null)
+            {
+                return Ok(new { message = "User Ajoutée !", obj = user });
+            }
+            return BadRequest($"L'ajout de l'utilisateur {dto.LasttName} a échoué ");
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteUser(UserUpdateDto userUpdateDto)
+        public async Task<IActionResult> UpadteUser(UserUpdateDto dto)
         {
-            var user = await _rep.Upadte(userUpdateDto);
+            var user = await _rep.GetById(dto.Id);
+
             if (user is null)
             {
-                return NotFound($"Ce User \"{userUpdateDto.LasttName}\" n'existe pas !");
+                return NotFound($"L'utilisateur avec l'Id {dto.Id} n'existe pas");
             }
-            return Ok(new { msg = "User Modifié", obj = user });
+
+            var organisation = await _orgRep.GetById(dto.OrganisationId);
+            if (organisation is null)
+            {
+                return BadRequest($"L'organisation avec l'Id {dto.OrganisationId} n'existe pas.");
+            }
+
+            user.FirstName = dto.FirstName;
+            user.LasttName = dto.LasttName;
+            user.Email = dto.Email;
+            user.Password = dto.Password;
+            user.Role = dto.Role;
+            user.TailleCm = dto.TailleCm;
+            user.IsActif = dto.IsActif;
+            user.PhoneNumber = dto.PhoneNumber;
+            user.OrganisationId = dto.OrganisationId;
+
+            var usrUpdate = await _rep.Upadte(user);
+            if (usrUpdate is not null)
+            {
+                return Ok($"L'utilisateur {user.LasttName} est modifiée avec succès..");
+            }
+            
+            return BadRequest($"La modification de l'utilisateur {dto.LasttName} a échoué !!");
         }
 
         [HttpDelete("{id}")]

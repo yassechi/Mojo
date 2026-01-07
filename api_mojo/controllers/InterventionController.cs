@@ -1,7 +1,6 @@
+using infrastructure_mojo.repositories;
 using Microsoft.AspNetCore.Mvc;
 using core_mojo.models;
-using core_mojo.interfaces;
-using core_mojo.interfaces;
 using core_mojo.Dtos;
 
 namespace api_mojo.controllers
@@ -10,11 +9,13 @@ namespace api_mojo.controllers
     [Route("api/[controller]")]
     public class InterventionController : ControllerBase
     {
-        private readonly IRepository<Intervention, InterventionAddDto, InterventionUpdateDto> _rep;
+        private readonly InterventionRepository _rep;
+        private readonly VeloRepository _veloRep;
 
-        public InterventionController(IRepository<Intervention, InterventionAddDto, InterventionUpdateDto> rep)
+        public InterventionController(InterventionRepository rep, VeloRepository veloRep)
         {
             _rep = rep;
+            _veloRep = veloRep;
         }
 
         [HttpGet]
@@ -38,22 +39,64 @@ namespace api_mojo.controllers
         [HttpPost]
         public async Task<IActionResult> AddIntervention(InterventionAddDto dto)
         {
-            var intervention = await _rep.Add(dto);
-            return Ok(new { message = "Intervention Ajoutée !", obj = intervention });
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var velo = await _veloRep.GetById(dto.VeloId);
+            if (velo is null)
+            {
+                return BadRequest($"Le vélo avec l'Id {dto.VeloId} n'existe pas.");
+            }
+
+            Intervention intervention = new()
+            {
+                DateIntervention = dto.DateIntervention,
+                TypeIntervention = dto.TypeIntervention,
+                Description = dto.Description,
+                Cout = dto.Cout,
+                VeloId = dto.VeloId
+            };
+
+            var inter = await _rep.Add(intervention);
+            if (inter is not null)
+            {
+                return Ok(new { message = "Intervention Ajoutée !", obj = inter });
+            }
+            return BadRequest($"L'ajout de l'intervention {dto.TypeIntervention} a échoué.");
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpadteIntervention(InterventionUpdateDto dto)
+        public async Task<IActionResult> UpadteIntervention(Intervention dto)
         {
-            var intervention = await _rep.Upadte(dto);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var intervention = await _rep.GetById(dto.Id);
             if (intervention is null)
             {
-                return NotFound($"L'intervention avec l'Id \"{dto.Id}\" n'existe pas !");
+                return NotFound($"L'intervention avec l'Id {dto.Id} n'existe pas.");
             }
-            return Ok(new { msg = "Intervention Modifiée", obj = intervention });
+
+            var velo = await _veloRep.GetById(dto.VeloId);
+            if (velo is null)
+            {
+                return BadRequest($"Le vélo avec l'Id {dto.VeloId} n'existe pas.");
+            }
+
+            intervention.DateIntervention = dto.DateIntervention;
+            intervention.TypeIntervention = dto.TypeIntervention;
+            intervention.Description = dto.Description;
+            intervention.Cout = dto.Cout;
+            intervention.VeloId = dto.VeloId;
+
+            var intervUpdate = await _rep.Upadte(intervention);
+            if (intervUpdate is not null)
+            {
+                return Ok(new { message = "Intervention modifiée avec succès.", obj = intervUpdate });
+            }
+            
+            return BadRequest($"La modification de l'intervention a échoué.");
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteIntervention(int id)
         {
             if (await _rep.Delete(id))
